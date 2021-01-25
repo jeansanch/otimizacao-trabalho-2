@@ -6,15 +6,13 @@
 typedef struct node
 {	
 	float value;
-	Node *son;
-
+	struct node *son;
 } Node;
 
 typedef struct actor
 {
-	int groups[];
 	int cost;
-
+	int groups[];
 } Actor;
 
 
@@ -23,7 +21,7 @@ int main(int argc, char *argv[ ]){
 	if(argc > 1)
 		printf("O número de argumentos é maior do que o esperado");
 
-	int AllGroups[];
+	int *AllGroups;
 
 	return 0;
 }
