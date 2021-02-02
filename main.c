@@ -6,6 +6,7 @@
 #include <math.h>
 
 bool isNotInPath(int *path, int actorIndex, int limit);
+bool isInAllGroups(int ngroups, int *list, int limit);
 
 typedef struct node{	
 
@@ -47,6 +48,7 @@ int main(int argc, char *argv[ ]){
 	int *all_groups;
 	int n_groups = 0, n_actors = 0, n_chars = 0;
 	int i,j;
+	bool *groupList;
 	//Verificação de argumentos
 	if(argc > 2)
 		printf("O numero de argumentos e maior do que o esperado");
@@ -61,7 +63,9 @@ int main(int argc, char *argv[ ]){
 	
 	//Tratamento do input
 	scanf("%d %d %d", &n_groups, &n_actors, &n_chars);
-
+	
+	groupList = malloc(sizeof(bool)*n_groups);
+	
 	int aux_n_groups, aux_cost;
 
 	ActorList *actorsList = malloc(sizeof(ActorList));
@@ -97,40 +101,56 @@ int main(int argc, char *argv[ ]){
 	root->used = true;
 	aux = root;
 	
-	//malloc para número de filhos otimizados
-	int n_filhos = n_actors-((n_chars-1)-(aux->level-1));
-	aux->son = malloc(sizeof(Node)*n_filhos);
 	
-	for(i = aux->actorIndex; i < n_filhos+aux->actorIndex; i++){
-		aux->son[i]->actorIndex = i;
-		aux->son[i]->cost = 0;
-		aux->son[i]->level = aux->level+1;
-		aux->son[i]->path = realloc(aux->son[i]->path, sizeof(int)*aux->level);
-		aux->son[i]->path[aux->level-1] = i;
-		for(j = 0; j < 0; j++){
-			aux->son[i]->cost = aux->son[i]->cost + actorsList->actors[j]->cost*pow(n_groups/actorsList->actors[j]->groupsList->size, 1.1);
+	if(aux->level-1 != n_chars){
+		//malloc para número de filhos otimizados
+		int n_filhos = n_actors-((n_chars-1)-(aux->level-1));
+		aux->son = malloc(sizeof(Node)*n_filhos);
+		
+		for(i = aux->actorIndex; i < n_filhos+aux->actorIndex; i++){
+			aux->son[i]->actorIndex = i;
+			aux->son[i]->cost = 0;
+			aux->son[i]->level = aux->level+1;
+			aux->son[i]->path = realloc(aux->son[i]->path, sizeof(int)*aux->level);
+			aux->son[i]->path[aux->level-1] = i;
+			for(j = 0; j < 0; j++){
+				aux->son[i]->cost = aux->son[i]->cost + actorsList->actors[j]->cost*pow(n_groups/actorsList->actors[j]->groupsList->size, 1.1);
+			}
 		}
-	}
-	
-	float faux;
-	float bound = FLT_MAX;
-	//soma de todos os personagens - personagens do caminho
-	for(i = 0; i < n_filhos; i++){
-		for(j = 0; j < n_actors; j++){
-			if(isNotInPath(aux->son[i]->path, j, aux->son[i]->level-1))
-				faux = aux->son[j]->cost + faux;
+		
+		float faux;
+		float bound = FLT_MAX;
+		
+		//soma de todos os personagens - personagens do caminho
+		for(i = 0; i < n_filhos; i++){
+			for(j = 0; j < n_actors; j++){
+				if(isNotInPath(aux->son[i]->path, j, aux->son[i]->level-1))
+					faux = aux->son[j]->cost + faux;
+			}
+			if (faux < bound)
+				bound = faux;
 		}
-		if (faux < bound)
-			bound = faux;
+		
+		for(i = 0; i < n_filhos; i++){
+			if(aux->son[i]->cost > bound)
+				aux->son[i]->used = true;
+			aux->son[i]->used = false;
+		}
+		
+		//Encontra proximo nó
 	}
-	
-	for(i = 0; i < n_filhos; i++){
-		if(aux->son[i]->cost > bound)
-			aux->son[i]->used = true;
-		aux->son[i]->used = false;
+	if(isInAllGroups(n_groups, aux->path, aux->level-1)){
 	}
-	
 	return 0;
+}
+
+bool isInAllGroups(int ngroups, int *list, int limit){
+	int i;
+	bool groups[ngroups];
+	
+	for(i = 0; i < limit; i++){
+		
+	}
 }
 
 bool isNotInPath(int *path, int actorIndex, int limit){
