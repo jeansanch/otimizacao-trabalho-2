@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <float.h>
+#include <math.h>
+
+bool isNotInPath(int *path, int actorIndex, int limit);
 
 typedef struct node{	
 
@@ -12,6 +15,7 @@ typedef struct node{
 	int actorIndex;
 	struct node *father;
 	struct node **son;
+	bool used;
 
 } Node;
 
@@ -86,37 +90,55 @@ int main(int argc, char *argv[ ]){
 	//Gerando a raiz da árvore
 	Node *aux;
 	Node *root = malloc(sizeof(Node));
-	root->actorIndex = -1;
+	root->actorIndex = 0;
 	root->cost = 0;
 	root->father = NULL;
 	root->level = 1;
+	root->used = true;
 	aux = root;
 	
 	//malloc para número de filhos otimizados
 	int n_filhos = n_actors-((n_chars-1)-(aux->level-1));
 	aux->son = malloc(sizeof(Node)*n_filhos);
 	
-	for(i = 0; i < n_filhos; i++){
+	for(i = aux->actorIndex; i < n_filhos+aux->actorIndex; i++){
 		aux->son[i]->actorIndex = i;
 		aux->son[i]->cost = 0;
 		aux->son[i]->level = aux->level+1;
-		aux->son[i]->path[] = realloc(aux->son[i]->path[], sizeof((int)*aux->level));
+		aux->son[i]->path = realloc(aux->son[i]->path, sizeof(int)*aux->level);
 		aux->son[i]->path[aux->level-1] = i;
 		for(j = 0; j < 0; j++){
-			aux->son[i]->cost = aux->son[i]->cost + actorList->actors[j]->cost*n_groups/actorList->actors[j]->groupsList->size;
+			aux->son[i]->cost = aux->son[i]->cost + actorsList->actors[j]->cost*pow(n_groups/actorsList->actors[j]->groupsList->size, 1.1);
 		}
 	}
 	
-	float aux;
+	float faux;
 	float bound = FLT_MAX;
-	//soma de todos os personagens - personagem atual - personagens do caminho
+	//soma de todos os personagens - personagens do caminho
 	for(i = 0; i < n_filhos; i++){
 		for(j = 0; j < n_actors; j++){
-			if(i != j)
-				aux = 
+			if(isNotInPath(aux->son[i]->path, j, aux->son[i]->level-1))
+				faux = aux->son[j]->cost + faux;
 		}
+		if (faux < bound)
+			bound = faux;
+	}
+	
+	for(i = 0; i < n_filhos; i++){
+		if(aux->son[i]->cost > bound)
+			aux->son[i]->used = true;
+		aux->son[i]->used = false;
 	}
 	
 	return 0;
 }
 
+bool isNotInPath(int *path, int actorIndex, int limit){
+	int i;
+	bool flag = false;
+	for(i = 0; i < limit; i++){
+		if(path[i] == actorIndex)
+			flag = true;
+	}
+	return flag;
+}
