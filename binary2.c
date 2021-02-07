@@ -56,6 +56,7 @@ bool isInAllGroups(int ngroups, int *list, int size, ActorList *actorL);
 int main(int argc, char *argv[ ]){
 		
 	//Variaveis usadas no input
+	int visited = 0;
 	bool parameter_a = false;
 	int *all_groups;
 	int n_groups = 0, n_actors = 0, n_chars = 0;
@@ -122,9 +123,7 @@ int main(int argc, char *argv[ ]){
 	
 	while(sa != NULL){
 		aux = sa->no;
-		if(aux->level == 11){
-			printf("AAAAAAAAAAAAAAA");
-		}
+		visited++;
 		if(optimal->cost < aux->cost){
 		//	printf("REMOVENDO DA STACK\n");
 			popAndStack(&sa, false);
@@ -164,12 +163,13 @@ int main(int argc, char *argv[ ]){
 		
 	}
 	
+	printf("\n");
 	if(optimal->cost == FLT_MAX){
 		printf("Inviavel");
 	}
 	else
 		printResult(optimal->path, n_chars, actorsList);
-	
+	printf("\n\nNOS VISITADOS = %d\n\n", visited);
 	return 0;
 }
 
@@ -208,12 +208,11 @@ float bound(Node *no, ActorList *list, bool left, bool a){
 	//lazy bound
 	if(left)
 		return no->cost + list->actors[(no->left->level-1)-1]->cost;
-	return no->cost + list->actors[(no->right->level-1)-1]->cost;
+	return no->cost;
 }
 
 bool isInAllGroups(int ngroups, int *list, int size, ActorList *actorL){
 	int i, j;
-	printResult(list, size, actorL);
 	//Checando se todos os grupos foram escolhido
 	bool groups[ngroups];
 	for(i = 0; i < ngroups; groups[i] = false, i++);
