@@ -160,6 +160,7 @@ int main(int argc, char *argv[ ]){
 			aux->right->level = aux->level + 1;
 			aux->right->g = aux->g;
 			aux->right->cost = bound(aux, actorsList, false, parameter_a, aux->right->g, aux->g, n_groups);
+			
 //			aux->right->cost = bound(aux, actorsList, false, parameter_a);
 			
 			aux->left->nactors = aux->nactors + 1;
@@ -236,9 +237,7 @@ float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, bool 
 			}
 //			printf("Number of new groups = %d\n", total);
 //			printf("Old cost = %f\nCost without -a = %f\nCost with -a = %f\n", no->cost, no->cost + list->actors[(no->left->level-1)-1]->cost, no->cost + list->actors[(no->left->level-1)-1]->cost*(1-(float)n_groups/total));
-			if((float)n_groups/total == 1)
-				return no->cost + list->actors[(no->left->level-1)-1]->cost;
-			return no->cost + list->actors[(no->left->level-1)-1]->cost*(1-(float)n_groups/total);
+			return no->cost + list->actors[(no->left->level-1)-1]->cost + (float)n_groups/total*3;
 		}
 	//lazy bound
 		return no->cost + list->actors[(no->left->level-1)-1]->cost;
