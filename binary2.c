@@ -188,7 +188,7 @@ int main(int argc, char *argv[ ]){
 		printResult(optimal->path, n_chars, actorsList);
 	#ifdef DEBUG
 		printf("\n\nNOS VISITADOS = %d\n\n", visited);
-		clock_t begin = end();
+		clock_t end = clock();
 		time_spent += (double)(end - start) / CLOCKS_PER_SEC;
 		printf("TIME: %f seconds", time_spent);
 	#endif
