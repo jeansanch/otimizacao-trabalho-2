@@ -49,7 +49,7 @@ typedef struct stack{
 
 void popAndStack(Stack **s, bool add);
 void printResult(int *path, int size, ActorList *list);
-float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n_groups);
+float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n_groups, float avg);
 bool isInAllGroups(int ngroups, int *list, int size, ActorList *actorL);
 //float bound(Node *no, ActorList *list, bool left, bool a);
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[ ]){
 	ActorList *actorsList = malloc(sizeof(ActorList));
 	actorsList->actors = malloc(sizeof(Actor)*n_actors);
 	actorsList->size = n_actors;
-	
+	float total = 0;
 	//Passando por cada ator e definindo seus custos e grupos
 	for(i = 0; i < n_actors; i++){
 		Actor *actor;
@@ -94,6 +94,7 @@ int main(int argc, char *argv[ ]){
 		scanf("%d %d", &aux_cost , &aux_n_groups);
 		
 		actor = malloc(sizeof(Actor));
+		total += aux_cost;
 		actor->cost = aux_cost;
 		group = malloc(sizeof(Groups));
 		group->groups = malloc(sizeof(Groups)*aux_n_groups);
@@ -106,6 +107,7 @@ int main(int argc, char *argv[ ]){
 		actorsList->actors[i] = actor;
 	}
 	
+	total = total/actorsList->size;
 	#ifdef DEBUG
 		clock_t start = clock();
 		double time_spent;
@@ -159,7 +161,7 @@ int main(int argc, char *argv[ ]){
 			aux->right->path = aux->path;
 			aux->right->level = aux->level + 1;
 			aux->right->g = aux->g;
-			aux->right->cost = bound(aux, actorsList, false, parameter_a, aux->right->g, n_groups);
+			aux->right->cost = bound(aux, actorsList, false, parameter_a, aux->right->g, n_groups, total);
 			
 //			aux->right->cost = bound(aux, actorsList, false, parameter_a);
 			
@@ -174,7 +176,7 @@ int main(int argc, char *argv[ ]){
 			//Copiando a array do caminho do no anterior para o novo
 			for(k = 0; k < aux->nactors; aux->left->path[k] = aux->path[k], k++);
 			aux->left->path[aux->left->nactors - 1] = aux->left->level - 1;
-			aux->left->cost = bound(aux, actorsList, true, parameter_a, aux->left->g, n_groups);
+			aux->left->cost = bound(aux, actorsList, true, parameter_a, aux->left->g, n_groups, total);
 //			aux->left->cost = bound(aux, actorsList, true, parameter_a);
 			//printf("ADICIONANDO A STACK\n");
 			popAndStack(&sa, true);
@@ -224,7 +226,7 @@ void printResult(int *path, int size, ActorList *list){
 	return;
 }
 
-float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n_groups){
+float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n_groups, float avg){
 	
 	if(left){
 		if(a){
@@ -237,7 +239,7 @@ float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n
 			}
 //			printf("Number of new groups = %d\n", total);
 //			printf("Old cost = %f\nCost without -a = %f\nCost with -a = %f\n", no->cost, no->cost + list->actors[(no->left->level-1)-1]->cost, no->cost + list->actors[(no->left->level-1)-1]->cost*(1-(float)n_groups/total));
-			return no->cost + list->actors[(no->left->level-1)-1]->cost/total;
+			return no->cost + list->actors[(no->left->level-1)-1]->cost + (1-total/n_groups)*avg;
 		}
 	//lazy bound
 		return no->cost + list->actors[(no->left->level-1)-1]->cost;
