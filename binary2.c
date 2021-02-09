@@ -50,8 +50,9 @@ typedef struct stack{
 
 void popAndStack(Stack **s, bool add);
 void printResult(int *path, int size, ActorList *list);
-float bound(Node *no, ActorList *list, bool left, bool a);
+float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, bool *oldGroups, int n_groups);
 bool isInAllGroups(int ngroups, int *list, int size, ActorList *actorL);
+//float bound(Node *no, ActorList *list, bool left, bool a);
 
 int main(int argc, char *argv[ ]){
 		
@@ -64,12 +65,14 @@ int main(int argc, char *argv[ ]){
 	bool *groupList;
 	//Verificação de argumentos
 	if(argc > 2)
-		printf("O numero de argumentos e maior do que o esperado");
+		printf("O numero de argumentos e maior do que o esperado!\n");
+		printf("Continuando o programa supondo que o primeiro parametro seja -a\n");
+		
 	if(argc == 2){
-		if(strcmp(argv[1], "-a"))
+		if(strcmp(argv[1], "-a%0")){		
 			parameter_a = true;
+		}
 		else{
-			
 			return 1;
 		}
 	}
@@ -113,6 +116,7 @@ int main(int argc, char *argv[ ]){
 	optimal->cost = FLT_MAX;
 	Node *aux;
 	Node *root = malloc(sizeof(Node));
+	root->g = malloc(sizeof(bool)*n_groups);
 	root->actorIndex = 0;
 	root->cost = 0;
 	root->level = 1;
@@ -121,6 +125,7 @@ int main(int argc, char *argv[ ]){
 	root->path = NULL;
 	sa->no = root;
 	
+	//percorrendo os nos
 	while(sa != NULL){
 		aux = sa->no;
 		visited++;
@@ -149,14 +154,23 @@ int main(int argc, char *argv[ ]){
 			aux->right->nactors = aux->nactors;
 			aux->right->path = aux->path;
 			aux->right->level = aux->level + 1;
-			aux->right->cost = bound(aux, actorsList, false, parameter_a);
+			aux->right->g = aux->g;
+			aux->right->cost = bound(aux, actorsList, false, parameter_a, aux->right->g, aux->g, n_groups);
+//			aux->right->cost = bound(aux, actorsList, false, parameter_a);
 			
 			aux->left->nactors = aux->nactors + 1;
 			aux->left->path = malloc(aux->left->nactors*sizeof(int));
 			aux->left->level = aux->level + 1;
+			aux->left->g = malloc(sizeof(bool)*n_groups);
+			aux->left->g = aux->g;
+			for(i = 0; i < actorsList->actors[aux->left->level-2]->groupsList->size; i++){
+				aux->left->g[actorsList->actors[aux->left->level-2]->groupsList->groups[i]] = true;
+			}
+			//Copiando a array do caminho do no anterior para o novo
 			for(k = 0; k < aux->nactors; aux->left->path[k] = aux->path[k], k++);
 			aux->left->path[aux->left->nactors - 1] = aux->left->level - 1;
-			aux->left->cost = bound(aux, actorsList, true, parameter_a);
+			aux->left->cost = bound(aux, actorsList, true, parameter_a, aux->left->g, aux->g, n_groups);
+//			aux->left->cost = bound(aux, actorsList, true, parameter_a);
 			//printf("ADICIONANDO A STACK\n");
 			popAndStack(&sa, true);
 		}
@@ -169,7 +183,9 @@ int main(int argc, char *argv[ ]){
 	}
 	else
 		printResult(optimal->path, n_chars, actorsList);
-	printf("\n\nNOS VISITADOS = %d\n\n", visited);
+	#ifdef DEBUG
+		printf("\n\nNOS VISITADOS = %d\n\n", visited);
+	#endif
 	return 0;
 }
 
@@ -200,14 +216,24 @@ void printResult(int *path, int size, ActorList *list){
 	return;
 }
 
-float bound(Node *no, ActorList *list, bool left, bool a){
-	if(a){
+float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, bool *oldGroups, int n_groups){
 	
-		return 0;	
-	}
+	if(left){
+		if(a){
+//			printf("Using group into consideration\n");
+			int total = 0, i;
+			for(i = 0; i < n_groups; i++){
+				if(newGroups[i] == true && oldGroups[i] == false){
+					total++;
+				}
+			}
+//			printf("Number of new groups = %d\n", total);
+//			printf("Old cost = %f\nCost without -a = %f\nCost with -a = %f\n", no->cost, no->cost + list->actors[(no->left->level-1)-1]->cost, no->cost + list->actors[(no->left->level-1)-1]->cost*(1-(float)n_groups/total));
+			return no->cost + list->actors[(no->left->level-1)-1]->cost*(1-(float)n_groups/total);
+		}
 	//lazy bound
-	if(left)
 		return no->cost + list->actors[(no->left->level-1)-1]->cost;
+	}
 	return no->cost;
 }
 
