@@ -248,7 +248,6 @@ int main(int argc, char *argv[ ]){
 		}
 		
 	}
-	printf("\n");
 	if(optimal->cost == FLT_MAX){
 		printf("Inviavel");
 	}
