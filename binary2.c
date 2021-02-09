@@ -3,9 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <float.h>
-#include <math.h>
 #include <limits.h>
-
+#include <time.h>
 
 typedef struct node{	
 
@@ -107,6 +106,10 @@ int main(int argc, char *argv[ ]){
 		actorsList->actors[i] = actor;
 	}
 	
+	#ifdef DEBUG
+		clock_t start = clock();
+	#endif
+	
 	//Gerando a raiz da árvore e as variaveis necessarias
 	Stack *sa = malloc(sizeof(Stack));
 	sa->next = NULL;
@@ -185,6 +188,9 @@ int main(int argc, char *argv[ ]){
 		printResult(optimal->path, n_chars, actorsList);
 	#ifdef DEBUG
 		printf("\n\nNOS VISITADOS = %d\n\n", visited);
+		clock_t begin = end();
+		time_spent += (double)(end - start) / CLOCKS_PER_SEC;
+		printf("TIME: %f seconds", time_spent);
 	#endif
 	return 0;
 }
