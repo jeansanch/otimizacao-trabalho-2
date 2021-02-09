@@ -237,7 +237,7 @@ float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n
 			}
 //			printf("Number of new groups = %d\n", total);
 //			printf("Old cost = %f\nCost without -a = %f\nCost with -a = %f\n", no->cost, no->cost + list->actors[(no->left->level-1)-1]->cost, no->cost + list->actors[(no->left->level-1)-1]->cost*(1-(float)n_groups/total));
-			return no->cost + list->actors[(no->left->level-1)-1]->cost + (n_groups - total)*list->actors[(no->left->level-1)-1]->cost;
+			return no->cost + list->actors[(no->left->level-1)-1]->cost + (1-(total/n_groups))*list->actors[(no->left->level-1)-1]->cost;
 		}
 	//lazy bound
 		return no->cost + list->actors[(no->left->level-1)-1]->cost;
