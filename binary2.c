@@ -108,6 +108,7 @@ int main(int argc, char *argv[ ]){
 	
 	#ifdef DEBUG
 		clock_t start = clock();
+		double time_spent;
 	#endif
 	
 	//Gerando a raiz da árvore e as variaveis necessarias
