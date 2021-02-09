@@ -191,7 +191,7 @@ int main(int argc, char *argv[ ]){
 		printf("\n\nNOS VISITADOS = %d\n\n", visited);
 		clock_t end = clock();
 		time_spent += (double)(end - start) / CLOCKS_PER_SEC;
-		printf("TIME: %f seconds", time_spent);
+		printf("TIME: %f seconds\n", time_spent);
 	#endif
 	return 0;
 }
