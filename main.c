@@ -49,7 +49,7 @@ typedef struct stack{
 } Stack;
 
 void popAndStack(Stack **s, bool add);
-void printResult(int *path, int size, ActorList *list);
+void printResult(int *path, int size, ActorList *list, bool a);
 float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, bool *oldGroups, int n_groups);
 bool isInAllGroups(int ngroups, int *list, int size, ActorList *actorL);
 //float bound(Node *no, ActorList *list, bool left, bool a);
@@ -253,7 +253,7 @@ int main(int argc, char *argv[ ]){
 		printf("Inviavel");
 	}
 	else
-		printResult(optimal->path, n_chars, actorsList);
+		printResult(optimal->path, n_chars, actorsList, parameter_a);
 	#ifdef DEBUG
 		printf("\n\nNOS VERIFICADOS = %d\n", verified);
 		printf("NOS PERCORRIDOS = %d\n", visited);
@@ -279,14 +279,36 @@ void popAndStack(Stack **s, bool add){
 	}		
 }
 
-void printResult(int *path, int size, ActorList *list){
+void printResult(int *path, int size, ActorList *list, bool a){
 	int i, sum = 0;
-	
+	if(a){
+		int smallest = INT_MAX;
+		int old = 0, count = 0;
+		i = 0;
+		while(count != size){
+			if(smallest == path[i]){
+				printf("%d ", path[i]);
+				old = smallest;
+				smallest = INT_MAX;
+				count++;
+				sum += list->actors[path[i]-1]->cost;
+			}
+			else if(path[i] > old && path[i] < smallest){
+				smallest = path[i];
+			}
+			if(i < size)
+				i++;
+			else 
+				i = 0;
+		}
+		printf("\n%d", sum);
+		return;
+	}
 	for(i = 0; i < size; i++){
 		printf("%d ", path[i]);
 		sum = sum + list->actors[path[i]-1]->cost;
 	}
-	printf("\n%d",sum);
+	printf("\n%d", sum);
 	
 	return;
 }
