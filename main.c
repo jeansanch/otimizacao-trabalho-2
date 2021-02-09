@@ -49,7 +49,7 @@ typedef struct stack{
 
 void popAndStack(Stack **s, bool add);
 void printResult(int *path, int size, ActorList *list);
-float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, bool *oldGroups, int n_groups);
+float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n_groups);
 bool isInAllGroups(int ngroups, int *list, int size, ActorList *actorL);
 //float bound(Node *no, ActorList *list, bool left, bool a);
 
@@ -159,7 +159,7 @@ int main(int argc, char *argv[ ]){
 			aux->right->path = aux->path;
 			aux->right->level = aux->level + 1;
 			aux->right->g = aux->g;
-			aux->right->cost = bound(aux, actorsList, false, parameter_a, aux->right->g, aux->g, n_groups);
+			aux->right->cost = bound(aux, actorsList, false, parameter_a, aux->right->g, n_groups);
 			
 //			aux->right->cost = bound(aux, actorsList, false, parameter_a);
 			
@@ -174,7 +174,7 @@ int main(int argc, char *argv[ ]){
 			//Copiando a array do caminho do no anterior para o novo
 			for(k = 0; k < aux->nactors; aux->left->path[k] = aux->path[k], k++);
 			aux->left->path[aux->left->nactors - 1] = aux->left->level - 1;
-			aux->left->cost = bound(aux, actorsList, true, parameter_a, aux->left->g, aux->g, n_groups);
+			aux->left->cost = bound(aux, actorsList, true, parameter_a, aux->left->g, n_groups);
 //			aux->left->cost = bound(aux, actorsList, true, parameter_a);
 			//printf("ADICIONANDO A STACK\n");
 			popAndStack(&sa, true);
@@ -224,20 +224,20 @@ void printResult(int *path, int size, ActorList *list){
 	return;
 }
 
-float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, bool *oldGroups, int n_groups){
+float bound(Node *no, ActorList *list, bool left, bool a, bool *newGroups, int n_groups){
 	
 	if(left){
 		if(a){
 //			printf("Using group into consideration\n");
 			int total = 0, i;
 			for(i = 0; i < n_groups; i++){
-				if(newGroups[i] == true && oldGroups[i] == false){
+				if(newGroups[i] == true){
 					total++;
 				}
 			}
 //			printf("Number of new groups = %d\n", total);
 //			printf("Old cost = %f\nCost without -a = %f\nCost with -a = %f\n", no->cost, no->cost + list->actors[(no->left->level-1)-1]->cost, no->cost + list->actors[(no->left->level-1)-1]->cost*(1-(float)n_groups/total));
-			return no->cost + list->actors[(no->left->level-1)-1]->cost + (n_groups*10 - (float)n_groups/total*10);
+			return no->cost + list->actors[(no->left->level-1)-1]->cost + (n_groups*10 - (float)total*10);
 		}
 	//lazy bound
 		return no->cost + list->actors[(no->left->level-1)-1]->cost;
