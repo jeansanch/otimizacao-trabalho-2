@@ -240,11 +240,6 @@ int main(int argc, char *argv[ ]){
 			}
 			//Copiando a array do caminho do no anterior para o novo
 			for(k = 0; k < aux->nactors; aux->left->path[k] = aux->path[k], k++);
-			if(aux->left->nactors == 9){
-				if(aux->left->path[0] == 1 && aux->left->path[1] == 2 && aux->left->path[2] == 3 && aux->left->path[3] == 4 && aux->left->path[4] == 5 && aux->left->path[5] == 17 && aux->left->path[6] == 18 && aux->left->path[7] == 19){
-					printf("asidcasdj");
-				}
-			}
 			aux->left->path[aux->left->nactors - 1] = aux->left->level - 1;
 			aux->left->cost = bound(aux, actorsList, true, parameter_a, aux->left->g, aux->g, n_groups);
 //			aux->left->cost = bound(aux, actorsList, true, parameter_a);
@@ -253,7 +248,6 @@ int main(int argc, char *argv[ ]){
 		}
 		
 	}
-	
 	printf("\n");
 	if(optimal->cost == FLT_MAX){
 		printf("Inviavel");
